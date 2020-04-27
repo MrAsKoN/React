@@ -1,6 +1,7 @@
-import React from 'react';
-import {Card,CardBody,CardTitle,CardText,CardImg,Breadcrumb,BreadcrumbItem} from 'reactstrap';
+import React, { Component } from 'react';
+import {Card,CardBody,CardTitle,CardText,CardImg,Breadcrumb,BreadcrumbItem,Button, Modal, ModalHeader, ModalBody, Label, Row} from 'reactstrap';
 import {Link} from 'react-router-dom';
+import { LocalForm, Control, Errors } from 'react-redux-form';
 
 
 function RenderDish({dish}){
@@ -24,6 +25,84 @@ function RenderDish({dish}){
     }
 }
 
+
+const maxLength=(len)=>(val)=> !(val) || (val.length <= len);
+const minLength=(len)=>(val)=> (val) && (val.length >= len);
+
+class CommentForm extends Component{
+    constructor(props){
+        super(props);
+        this.state={
+            isCommentModalOpen: false
+        };
+        this.toggleCommentModal=this.toggleCommentModal.bind(this);
+
+    }
+
+    toggleCommentModal(){
+        this.setState({
+            isCommentModalOpen:!this.state.isCommentModalOpen
+        });
+    }
+
+    handleCommentSubmit(values){
+        this.toggleCommentModal();
+        console.log("Current State is:"+JSON.stringify(values));
+        alert("Current State is:"+JSON.stringify(values));
+    }
+
+    render(){
+        return(
+            <>
+            <div className='col-12 col-md-6 mb-3'>
+            <Button outline onClick={this.toggleCommentModal}>
+                <span className='fa fa-pencil fa-lg'></span> Submit Comment
+            </Button>
+            </div>
+           
+            <Modal isOpen={this.state.isCommentModalOpen} toggle={this.toggleCommentModal}>
+                <ModalHeader toggle={this.toggleCommentModal}>Submit Comment</ModalHeader>
+                <ModalBody>
+                    <div className='col-12'>
+                        <LocalForm onSubmit= {(values)=> this.handleCommentSubmit(values)}>
+                            <Row className='form-group'>
+                                <Label htmlFor='rating'>Rating</Label>
+                                <Control.select model='.rating' className='form-control' name='rating'>
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                    <option>5</option>
+                                </Control.select>
+                            </Row>
+                            <Row className='form-group'>
+                                <Label htmlFor='yourname'>Your Name</Label> 
+                                <Control.text className='form-control' model='.yourname' id='yourname' name='yourname'
+                                 placeholder='Your Name' validators={{minLength:minLength(3),maxLength:maxLength(15)}}/>
+                                 <Errors className='text-danger' model='.yourname' show='touched' 
+                                     messages={{minLength: "Must be more than 2 characters.",
+                                    maxLength: "Must be 15 characters or less."}}/>
+                            </Row>
+                            <Row className='form-group'>
+                                <Label htmlFor='comment'>Comment</Label>
+                                <Control.textarea className='form-control' model='.comment' id='yourname' name='yourname'
+                                 rows='6'/>
+                            </Row>
+                            <Row className='form-group'>
+                                <Button type='submit' color='primary'>Submit</Button>
+                            </Row>
+                        </LocalForm>
+                    </div>
+                </ModalBody>
+            </Modal>
+            
+        </>
+        );
+    }
+
+}
+
+
 function RenderComments({comments}){
     console.log("hi"+comments)
     if(comments!=null){
@@ -40,6 +119,7 @@ function RenderComments({comments}){
             <h4>Comments</h4>
             <Card>
                 <ul className='list-unstyled'>{Comments}</ul>
+                <CommentForm />   
             </Card>
         </div>
         );
